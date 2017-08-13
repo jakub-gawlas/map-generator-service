@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const winston = require('winston');
+const handlers = require('./handlers');
 
 const initRouter = Symbol();
 
@@ -36,6 +37,7 @@ class Server {
    * @param {object} app - express server instance
    */
   [initRouter](app) {
+    app.get('/image', handlers.getImageMap(this.mapService));
     app.get('/checkup', (req, res) => res.end('ok'));
   }
 }
