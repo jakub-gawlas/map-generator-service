@@ -10,14 +10,15 @@ class MapService {
     this.headless = null;
   }
   /**
-   * Initialize headless and navigate to application
+   * Initialize headless and navigate to web application
    */
   init() {
     return new Promise(async (resolve, reject) => {
       try {
         await this[startWebApp]();
-      } catch(err){
-        throw new Error('while start web application', err);
+      } catch (err) {
+        console.log(err);
+        throw new Error('while start web application');
       }
       const chrome = await chromeLauncher.launch({
         chromeFlags: ['--headless'],
@@ -53,13 +54,21 @@ class MapService {
   async getImageMap({ center, zoom = 5, width = 400, height = 400 } = {}) {
     if (!center) throw new Error('Required options parameter `center`');
 
+    // Script to run getMap function from web-app/script.js
+    const getMapScript = `getMap({ 
+      center: [${center[0]}, ${center[1]}], 
+      zoom: ${zoom}, 
+      width: ${width}, 
+      height: ${height} 
+    });`;
+
     const { Runtime } = this.headless;
     const image = await Runtime.evaluate({
-      expression: `getMap({ center: [${center[0]}, ${center[1]}], zoom: ${zoom}, width: ${width}, height: ${height} });`,
+      expression: getMapScript,
       awaitPromise: true,
     });
     const imageDataURL = image.result.value;
-    if(!image.result.value) throw new Error('Map cannot be generated');
+    if (!image.result.value) throw new Error('Map cannot be generated');
     const imageBase64 = imageDataURL.replace(/^data:image\/\w+;base64,/, '');
     return imageBase64;
   }
