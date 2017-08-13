@@ -13,7 +13,7 @@ const winston = require('winston');
 
   const mapService = new MapService(config);
   try {
-    await mapService.init();
+    await mapService.run();
   } catch (err) {
     winston.error('while initialize MapService', err);
     process.exit(1);
@@ -26,4 +26,13 @@ const winston = require('winston');
     winston.error('while start server', err);
     process.exit(1);
   }
+
+  // Graceful shutdown
+  function shutdown(){
+    winston.info('Start graceful shutdown')
+    mapService.shutdown();
+    server.shutdown();
+    winston.info('Finished graceful shutdown')
+  }
+  process.on('SIGTERM', shutdown).on('SIGINT', shutdown);
 })();

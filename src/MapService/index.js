@@ -4,29 +4,32 @@ const express = require('express');
 const path = require('path');
 const winston = require('winston');
 
+const MODULE = 'MapService';
+
 const startWebApp = Symbol();
 
 class MapService {
   constructor(config) {
     this.config = config;
+    this.chrome = null;
     this.headless = null;
   }
   /**
-   * Initialize headless and navigate to web application
+   * Run headless chromium, navigate to web application
    */
-  init() {
+  run() {
     return new Promise(async (resolve, reject) => {
       try {
         await this[startWebApp]();
       } catch (err) {
         winston.error(err);
-        throw new Error('while start web application');
+        throw new Error('Cannot start web application');
       }
-      const chrome = await chromeLauncher.launch({
+      this.chrome = await chromeLauncher.launch({
         chromeFlags: ['--headless'],
       });
       this.headless = await chromeRemoteInterface({
-        port: chrome.port,
+        port: this.chrome.port,
       });
       const { Page, Runtime } = this.headless;
       await Promise.all([Page.enable(), Runtime.enable()]);
@@ -43,6 +46,15 @@ class MapService {
     });
   }
   /**
+   * Close connection to headless
+   */
+  shutdown(){
+    winston.info(MODULE, 'start shutdown')
+    this.headless.close();
+    this.chrome.kill();
+    winston.info(MODULE, 'finished shutdown')
+  }
+  /**
    * @private
    * Start web application to generate maps
    */
@@ -54,7 +66,7 @@ class MapService {
     });
   }
   /**
-   * Return image of map as base64 png
+   * Return image of map as image/png buffer
    * @param {object} options:
    *  center {array}: center of map, in format [lng, lat], required
    *  zoom {number}: zoom of map, default 5
@@ -78,9 +90,10 @@ class MapService {
       awaitPromise: true,
     });
     const imageDataURL = image.result.value;
-    if (!image.result.value) throw new Error('Map cannot be generated');
+    if (!image.result.value) throw new Error('Cannot render map');
     const imageBase64 = imageDataURL.replace(/^data:image\/\w+;base64,/, '');
-    return imageBase64;
+    const imageBuffer = new Buffer(imageBase64, 'base64');
+    return imageBuffer;
   }
 }
 
