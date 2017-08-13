@@ -32,9 +32,9 @@ const winston = require('winston');
   }
 
   // Graceful shutdown
-  function shutdown() {
+  async function shutdown() {
     winston.info('Start graceful shutdown');
-    mapService.shutdown();
+    await mapService.shutdown();
     server.shutdown();
     winston.info('Finished graceful shutdown');
   }

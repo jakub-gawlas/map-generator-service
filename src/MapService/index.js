@@ -13,6 +13,7 @@ class MapService {
     this.config = config;
     this.chrome = null;
     this.headless = null;
+    this.webappServer = null;
   }
   /**
    * Run headless chromium, navigate to web application
@@ -46,15 +47,6 @@ class MapService {
     });
   }
   /**
-   * Close connection to headless
-   */
-  shutdown(){
-    winston.info(MODULE, 'start shutdown')
-    this.headless.close();
-    this.chrome.kill();
-    winston.info(MODULE, 'finished shutdown')
-  }
-  /**
    * @private
    * Start web application to generate maps
    */
@@ -62,8 +54,21 @@ class MapService {
     return new Promise((resolve, reject) => {
       const app = express();
       app.use('/', express.static(path.resolve(__dirname, 'web-app')));
-      app.listen(8080, resolve);
+      this.webappServer = app.listen(8080, resolve);
     });
+  }
+  /**
+   * Close connection to headless
+   */
+  async shutdown(){
+    winston.info(MODULE, 'start shutdown')
+    await this.headless.close();
+    await this.chrome.kill();
+    this.webappServer.close();
+    this.headless = null;
+    this.chrome = null;
+    this.webappServer = null;
+    winston.info(MODULE, 'finished shutdown')
   }
   /**
    * Return image of map as image/png buffer
