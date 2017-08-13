@@ -1,27 +1,19 @@
 const MapService = require('./MapService');
-const fs = require('fs-extra');
+const Server = require('./Server');
+const config = require('./config');
 
 (async () => {
   const mapService = new MapService();
   try {
     await mapService.init();
   } catch (err) {
-    console.error('while initialize', err);
+    console.error('while initialize MapService', err);
   }
 
-  let imageBase64;
+  const server = new Server(config, mapService);
   try {
-    imageBase64 = await mapService.getImageMap({
-      center: [19.0779332, 50.2389625],
-      zoom: 8,
-    });
+    await server.run();
   } catch (err) {
-    console.error('while get image map', err);
-  }
-
-  try {
-    await fs.writeFile('map.png', imageBase64, 'base64');
-  } catch (err) {
-    console.error('while save image', err);
+    console.error('while start server', err);
   }
 })();

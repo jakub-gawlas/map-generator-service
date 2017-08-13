@@ -1,6 +1,6 @@
 // Set MapBox token
 mapboxgl.accessToken =
-  'MAP_BOX_ACCESS_TOKEN';
+  'TOKEN';
 
 /**
  * Return promise, resolved to map in format base64 png
