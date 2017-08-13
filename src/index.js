@@ -3,6 +3,8 @@ const Server = require('./Server');
 const winston = require('winston');
 
 (async () => {
+
+  // Config
   let config;
   try {
     config = require('./config');
@@ -11,6 +13,7 @@ const winston = require('winston');
     process.exit(1);
   }
 
+  // MapService
   const mapService = new MapService(config);
   try {
     await mapService.run();
@@ -19,6 +22,7 @@ const winston = require('winston');
     process.exit(1);
   }
 
+  // Server
   const server = new Server(config, mapService);
   try {
     await server.run();
@@ -28,11 +32,14 @@ const winston = require('winston');
   }
 
   // Graceful shutdown
-  function shutdown(){
-    winston.info('Start graceful shutdown')
+  function shutdown() {
+    winston.info('Start graceful shutdown');
     mapService.shutdown();
     server.shutdown();
-    winston.info('Finished graceful shutdown')
+    winston.info('Finished graceful shutdown');
   }
   process.on('SIGTERM', shutdown).on('SIGINT', shutdown);
+
+  // Catch unhandled rejections
+  process.on('unhandledRejection', winston.error);
 })();
