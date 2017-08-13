@@ -42,6 +42,7 @@ class Server {
   shutdown() {
     winston.info(MODULE, 'start shutdown');
     this.server.close();
+    this.server = null;
     winston.info(MODULE, 'finished shutdown');
   }
   /**
