@@ -1,7 +1,3 @@
-// Set MapBox token
-mapboxgl.accessToken =
-  'TOKEN';
-
 /**
  * Return promise, resolved to map in format base64 png
  * @param {*} param0 

@@ -7,7 +7,8 @@ const winston = require('winston');
 const startWebApp = Symbol();
 
 class MapService {
-  constructor() {
+  constructor(config) {
+    this.config = config;
     this.headless = null;
   }
   /**
@@ -30,7 +31,15 @@ class MapService {
       const { Page, Runtime } = this.headless;
       await Promise.all([Page.enable(), Runtime.enable()]);
       Page.navigate({ url: 'http://127.0.0.1:8080' });
-      Page.loadEventFired(resolve);
+      Page.loadEventFired(async () => {
+        const setMapboxTokenScript = `
+          mapboxgl.accessToken = '${this.config.APP_MAP_SERVICE_MAPBOX_TOKEN}'
+        `;
+        await Runtime.evaluate({
+          expression: setMapboxTokenScript,
+        });
+        resolve();
+      });
     });
   }
   /**
