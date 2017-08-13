@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const winston = require('winston');
 
 const initRouter = Symbol();
 
@@ -22,7 +23,7 @@ class Server {
       app.use(cors());
       this[initRouter](app);
       app.listen(this.config.APP_SERVER_PORT, () => {
-        console.log(
+        winston.info(
           `Server started on 127.0.0.1:${this.config.APP_SERVER_PORT}`
         );
         resolve();

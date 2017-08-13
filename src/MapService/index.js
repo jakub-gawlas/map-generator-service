@@ -2,6 +2,7 @@ const chromeLauncher = require('chrome-launcher');
 const chromeRemoteInterface = require('chrome-remote-interface');
 const express = require('express');
 const path = require('path');
+const winston = require('winston');
 
 const startWebApp = Symbol();
 
@@ -17,7 +18,7 @@ class MapService {
       try {
         await this[startWebApp]();
       } catch (err) {
-        console.log(err);
+        winston.error(err);
         throw new Error('while start web application');
       }
       const chrome = await chromeLauncher.launch({
