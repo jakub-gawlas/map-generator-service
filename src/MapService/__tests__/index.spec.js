@@ -14,14 +14,25 @@ describe('MapService', () => {
     expect(mapService.webappServer).toBeDefined();
   });
   describe('method getImageMap', () => {
-    it('should works', async () => {
-      const options = {
-        center: [19.0779332, 50.2389625],
-        zoom: 8,
-        width: 100,
-        height: 100,
-      };
-      expect(await mapService.getImageMap(options)).toMatchSnapshot();
+    describe('should works', () => {
+      [
+        {
+          center: [19.0779332, 50.2389625],
+          zoom: 8,
+          width: 100,
+          height: 100,
+        },
+        {
+          center: [19.0779332, 50.2389625],
+          zoom: 5,
+          width: 20,
+          height: 20,
+        },
+      ].forEach((options, i) => {
+        it(`case ${i}`, async () => {
+          expect(await mapService.getImageMap(options)).toMatchSnapshot();
+        });
+      });
     });
   });
   it('should shutdown', async () => {
