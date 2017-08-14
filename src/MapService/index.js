@@ -60,29 +60,37 @@ class MapService {
   /**
    * Close connection to headless
    */
-  async shutdown(){
-    winston.info(MODULE, 'start shutdown')
+  async shutdown() {
+    winston.info(MODULE, 'start shutdown');
     await this.headless.close();
     await this.chrome.kill();
     this.webappServer.close();
     this.headless = null;
     this.chrome = null;
     this.webappServer = null;
-    winston.info(MODULE, 'finished shutdown')
+    winston.info(MODULE, 'finished shutdown');
   }
   /**
    * Return image of map as image/png buffer
    * @param {object} options:
+   *  data {object}: geojson, required
+   *  adjustToData {boolean}: adjust maxBounds (center and zoom) to data, default true
    *  center {array}: center of map, in format [lng, lat], required
    *  zoom {number}: zoom of map, default 5
    *  width {number}: width of result image, default 400
    *  height {number}: height of result image, default 400
    */
-  async getImageMap({ center, zoom = 5, width = 400, height = 400 } = {}) {
+  async getImageMap({ data, adjustToData = true, center, zoom = 5, width = 400, height = 400 } = {}) {
+
+    const maxBounds = data ? [[0,0],[0,0]] : null;
+    const dataString = data ? JSON.stringify(data) : null;
+
     if (!center) throw new Error('Required options parameter `center`');
 
     // Script to run getMap function from web-app/script.js
-    const getMapScript = `getMap({ 
+    const getMapScript = `getMap({
+      data: ${dataString},
+      maxBounds: ${maxBounds},
       center: [${center[0]}, ${center[1]}], 
       zoom: ${zoom}, 
       width: ${width}, 

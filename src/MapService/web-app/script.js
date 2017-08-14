@@ -2,7 +2,7 @@
  * Return promise, resolved to map in format base64 png
  * @param {*} param0 
  */
-function getMap({ center, zoom, width = 200, height = 200 }) {
+function getMap({ data, maxBounds, center, zoom, width, height }) {
   return new Promise((resolve, reject) => {
     const mapId = Math.floor(Math.random() * 1000);
     const container = document.createElement('div');
@@ -11,14 +11,28 @@ function getMap({ center, zoom, width = 200, height = 200 }) {
       style: 'mapbox://styles/mapbox/streets-v9',
       attributionControl: false,
       preserveDrawingBuffer: true,
-      center,
-      zoom,
+      center: maxBounds ? null : center,
+      zoom: maxBounds ? null : zoom,
+      maxBounds,
     });
     const canvas = map.getCanvas();
-    canvas.setAttribute('width', width);
-    canvas.setAttribute('height', height);
+    if(width) canvas.setAttribute('width', width);
+    if(height) canvas.setAttribute('height', height);
     map.on('load', () => {
-      resolve(map.getCanvas().toDataURL());
+      if (!data) {
+        return resolve(canvas.toDataURL());
+      }
+      map.addSource('shapes', Object.assign(data, { type: 'geojson' }));
+      map.addLayer({
+        id: 'filled-shapes',
+        type: 'fill',
+        source: 'shapes',
+        paint: {
+          'fill-color': '#888888',
+          'fill-opacity': 0.4,
+        },
+      });
+      setTimeout(() => resolve(canvas.toDataURL()), 100);
     });
   });
 }
