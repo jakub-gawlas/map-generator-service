@@ -83,3 +83,8 @@ Example `data` GeoJSON:
   ]
 }
 ```
+
+### Run with Docker
+
+Application uses **Chromium** in *headless mode* to generate maps, and additionaly required is *GPU acceleration*.
+**Docker** doesn't support *GPU*, so to run application in container is needed use [nvidia-docker](https://github.com/NVIDIA/nvidia-docker).
