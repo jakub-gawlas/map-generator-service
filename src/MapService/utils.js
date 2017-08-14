@@ -30,7 +30,12 @@ function getMaxBounds(geojson) {
   ];
 }
 
-function scaleBounds(bounds, k) {
+/**
+ * Return enlarged bounds in format [[minLng, minLat], [maxLng, maxLat]]
+ * @param {*} bounds - bounds to enlarge in format [[minLng, minLat], [maxLng, maxLat]]
+ * @param {*} k - enlarge factor
+ */
+function enlargeBounds(bounds, k) {
   const distanceLngs = bounds[0][0] - bounds[1][0];
   const distanceLats = bounds[0][0] - bounds[1][0];
   const deltaLngs = Math.abs(distanceLngs * k);
@@ -43,5 +48,5 @@ function scaleBounds(bounds, k) {
 
 module.exports = {
   getMaxBounds,
-  scaleBounds,
+  enlargeBounds,
 };

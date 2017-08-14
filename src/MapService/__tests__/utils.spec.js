@@ -77,4 +77,13 @@ describe('MapService utils', () => {
       });
     });
   });
+  describe('enlargeBounds', () => {
+    it('should works', () => {
+      const bounds = [[-1, -1], [1, 1]];
+      const k = 0.1;
+      const expected = [[-1.2, -1.2], [1.2, 1.2]];
+      const result = utils.enlargeBounds(bounds, k);
+      expect(result).toEqual(expected);
+    })
+  })
 });

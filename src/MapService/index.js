@@ -88,13 +88,13 @@ class MapService {
     if(!data) throw new Error('Required parameter `data`');
     const maxBounds = utils.getMaxBounds(data);
     if(!maxBounds) throw new Error('Bad format of `data`. Required GeoJSON format.');
-    const scaledMaxBounds = utils.scaleBounds(maxBounds, 0.3);
+    const enlargedMaxBounds = utils.enlargeBounds(maxBounds, 0.3);
     const source = data ? { type: 'geojson', data } : null;
 
     // Script to run getMap function from web-app/script.js
     const getMapScript = `getMap({
       source: ${JSON.stringify(source)},
-      maxBounds: ${JSON.stringify(scaledMaxBounds)},
+      maxBounds: ${JSON.stringify(enlargedMaxBounds)},
       width: ${width}, 
       height: ${height} 
     });`;
