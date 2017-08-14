@@ -29,6 +29,8 @@ yarn
 
 ### Run server
 
+To run server required is installed *Chrome* or *Chromium* supported **headless* mode with *GPU* acceleration.
+
 ```bash
 export APP_MAP_SERVICE_MAPBOX_TOKEN={{MAPBOX_TOKEN}}
 node src

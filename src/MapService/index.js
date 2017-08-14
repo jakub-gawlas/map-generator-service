@@ -6,6 +6,7 @@ const winston = require('winston');
 const utils = require('./utils');
 
 const MODULE = 'MapService';
+const ENLARGE_BOUNDS_FACTOR = 0.3;
 
 const startWebApp = Symbol();
 
@@ -88,7 +89,7 @@ class MapService {
     if(!data) throw new Error('Required parameter `data`');
     const maxBounds = utils.getMaxBounds(data);
     if(!maxBounds) throw new Error('Bad format of `data`. Required GeoJSON format.');
-    const enlargedMaxBounds = utils.enlargeBounds(maxBounds, 0.3);
+    const enlargedMaxBounds = utils.enlargeBounds(maxBounds, ENLARGE_BOUNDS_FACTOR);
     const source = data ? { type: 'geojson', data } : null;
 
     // Script to run getMap function from web-app/script.js
