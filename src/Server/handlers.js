@@ -2,13 +2,21 @@ const winston = require('winston');
 
 function getImageMap(mapService) {
   return async (req, res) => {
-    const lng = Number.parseFloat(req.query.lng);
-    const lat = Number.parseFloat(req.query.lat);
-
-    if (!lng || !lat) {
+    if (!req.query.data) {
       res.status(400);
       res.json({
-        error: 'Bad query parameters',
+        error: 'Required query parameter `data`',
+      });
+      return;
+    }
+
+    let data;
+    try {
+      data = JSON.parse(req.query.data);
+    } catch (err) {
+      res.status(400);
+      res.json({
+        error: 'Bad format of query paramater `data`. Required JSON format.',
       });
       return;
     }
@@ -16,17 +24,17 @@ function getImageMap(mapService) {
     let image;
     try {
       image = await mapService.getImageMap({
-       center: [lng, lat],
-     });
-    }catch(err){
-      winston.error('while handle request', req, err);
+        data,
+      });
+    } catch (err) {
+      winston.error('while handle request', err);
       res.status(400);
       res.json({
         error: 'Bad request',
       });
       return;
     }
-    
+
     res.writeHead(200, {
       'Content-Type': 'image/png',
       'Content-Length': image.length,

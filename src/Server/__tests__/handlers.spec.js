@@ -15,8 +15,7 @@ describe('Server handlers', () => {
       it('should send image', async () => {
         const mockReq = {
           query: {
-            lng: 19.0779332,
-            lat: 50.2389625,
+            data: '{"json": true}'
           },
         };
         const mockRes = {
@@ -31,24 +30,6 @@ describe('Server handlers', () => {
         expect(mockMapService.getImageMap).toHaveBeenCalledTimes(1);
         expect(mockRes.writeHead).toHaveBeenCalledWith(200, expectedHeader);
         expect(mockRes.end).toHaveBeenCalledWith(SAMPLE_IMAGE_BUFFER);
-      });
-      it('should send error message if bad query params', async () => {
-        const mockReq = {
-          query: {
-            lng: 1,
-            lat: 'NOT_VALID',
-          },
-        };
-        const mockRes = {
-          status: jest.fn(),
-          json: jest.fn(),
-        };
-        const expectedBody = {
-          error: 'Bad query parameters',
-        };
-        await handler(mockReq, mockRes);
-        expect(mockRes.status).toHaveBeenCalledWith(400);
-        expect(mockRes.json).toHaveBeenCalledWith(expectedBody);
       });
     });
   });

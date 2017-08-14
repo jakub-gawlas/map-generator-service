@@ -3,6 +3,7 @@ const chromeRemoteInterface = require('chrome-remote-interface');
 const express = require('express');
 const path = require('path');
 const winston = require('winston');
+const utils = require('./utils');
 
 const MODULE = 'MapService';
 
@@ -74,25 +75,26 @@ class MapService {
    * Return image of map as image/png buffer
    * @param {object} options:
    *  data {object}: geojson, required
-   *  adjustToData {boolean}: adjust maxBounds (center and zoom) to data, default true
-   *  center {array}: center of map, in format [lng, lat], required
-   *  zoom {number}: zoom of map, default 5
-   *  width {number}: width of result image, default 400
-   *  height {number}: height of result image, default 400
+   *  width {number}: width of result image, optional
+   *  height {number}: height of result image, optional
    */
-  async getImageMap({ data, adjustToData = true, center, zoom = 5, width = 400, height = 400 } = {}) {
-
-    const maxBounds = data ? [[0,0],[0,0]] : null;
-    const dataString = data ? JSON.stringify(data) : null;
-
-    if (!center) throw new Error('Required options parameter `center`');
+  async getImageMap(
+    {
+      data,
+      width,
+      height,
+    } = {}
+  ) {
+    if(!data) throw new Error('Required parameter `data`');
+    const maxBounds = utils.getMaxBounds(data);
+    if(!maxBounds) throw new Error('Bad format of `data`. Required GeoJSON format.');
+    const scaledMaxBounds = utils.scaleBounds(maxBounds, 0.3);
+    const source = data ? { type: 'geojson', data } : null;
 
     // Script to run getMap function from web-app/script.js
     const getMapScript = `getMap({
-      data: ${dataString},
-      maxBounds: ${maxBounds},
-      center: [${center[0]}, ${center[1]}], 
-      zoom: ${zoom}, 
+      source: ${JSON.stringify(source)},
+      maxBounds: ${JSON.stringify(scaledMaxBounds)},
       width: ${width}, 
       height: ${height} 
     });`;

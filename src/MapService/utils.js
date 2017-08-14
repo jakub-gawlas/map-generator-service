@@ -30,6 +30,18 @@ function getMaxBounds(geojson) {
   ];
 }
 
+function scaleBounds(bounds, k) {
+  const distanceLngs = bounds[0][0] - bounds[1][0];
+  const distanceLats = bounds[0][0] - bounds[1][0];
+  const deltaLngs = Math.abs(distanceLngs * k);
+  const deltaLats = Math.abs(distanceLats * k);
+  return [
+    [bounds[0][0] - deltaLngs, bounds[0][1] - deltaLats],
+    [bounds[1][0] + deltaLngs, bounds[1][1] + deltaLats],
+  ];
+}
+
 module.exports = {
   getMaxBounds,
+  scaleBounds,
 };
