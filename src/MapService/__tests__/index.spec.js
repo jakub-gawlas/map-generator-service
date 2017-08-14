@@ -18,8 +18,10 @@ describe('MapService', () => {
     describe('should works', () => {
       [
         {
-          data: sampleGeoJSON
-        }
+          data: sampleGeoJSON,
+          width: 50,
+          height: 50,
+        },
       ].forEach((options, i) => {
         it(`case ${i}`, async () => {
           expect(await mapService.getImageMap(options)).toMatchSnapshot();
