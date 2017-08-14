@@ -1,21 +1,40 @@
-const handlers = require('../handlers');
+const getImage = require('../getImage');
 
-describe('Server handlers', () => {
-  describe('method getImageMap', () => {
+describe('Server getImage', () => {
+  describe('validator', () => {
+    it('should parse query param `data`', () => {
+      const mockReq = {
+        query: {
+          data: '{"json": true}',
+        },
+      };
+      mockRes = {};
+      const mockNext = jest.fn();
+      const expectedReq = {
+        query: {
+          data: { json: true },
+        },
+      };
+      getImage.validator(mockReq, mockRes, mockNext);
+      expect(mockReq).toEqual(expectedReq);
+      expect(mockNext).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe('handler', () => {
     const SAMPLE_IMAGE_BUFFER = [137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13];
     const mockMapService = {
       getImageMap: jest.fn(async () => SAMPLE_IMAGE_BUFFER),
     };
     let handler;
-    it('should return handler', () => {
-      handler = handlers.getImageMap(mockMapService);
+    it('should return request handler', () => {
+      handler = getImage.handler(mockMapService);
       expect(handler).toBeInstanceOf(Function);
     });
-    describe('handler', () => {
+    describe('request handler', () => {
       it('should send image', async () => {
         const mockReq = {
           query: {
-            data: '{"json": true}'
+            data: { json: true },
           },
         };
         const mockRes = {

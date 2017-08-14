@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const winston = require('winston');
-const handlers = require('./handlers');
+const getImage = require('./getImage');
 
 const MODULE = 'Server';
 
@@ -52,7 +52,7 @@ class Server {
    */
   [initRouter]() {
     this.app
-      .get('/image', handlers.getImageMap(this.mapService))
+      .get('/image', getImage.validator, getImage.handler(this.mapService))
       .get('/checkup', (req, res) => res.end('ok'));
   }
 }
