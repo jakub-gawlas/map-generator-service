@@ -40,8 +40,11 @@ node src
 **GET /image**
 
 *query parameters:*
-- ***data***: GeoJSON of type *FeatureCollection*
-eg.
+- ***data*** *(JSON)*: GeoJSON of type *FeatureCollection* ***(required)***
+- ***width*** *(number)*: width of result image *FeatureCollection* *(optional)*
+- ***height*** *(number)*: height of result image *(optional)*
+
+Example `data` GeoJSON:
 ```geojson
 {
   "type": "FeatureCollection",
