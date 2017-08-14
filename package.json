@@ -7,6 +7,9 @@
     "start": "node src",
     "test": "jest"
   },
+  "engines": {
+    "node": ">=8"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
