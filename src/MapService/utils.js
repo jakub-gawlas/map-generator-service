@@ -25,8 +25,8 @@ function getMaxBounds(geojson) {
     { lngs: [], lats: [] }
   );
   return [
-    [Math.min(...lngsLats.lngs), Math.min(...lngsLats.lats)],
-    [Math.max(...lngsLats.lngs), Math.max(...lngsLats.lats)],
+    [Math.min(...lngsLats.lats), Math.min(...lngsLats.lngs)],
+    [Math.max(...lngsLats.lats), Math.max(...lngsLats.lngs)],
   ];
 }
 

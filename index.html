@@ -8,11 +8,15 @@
 <link href='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' rel='stylesheet' />
 <style>
   body { margin:0; padding:0; }
-  #map { position:absolute; top:0; bottom:0; width:400px;height:400px; }
+  #map { position:absolute; top:0; bottom:0; width:100%; }
 </style>
 </head>
 <body>
 <div id='map'></div>
-<script src='script.js'></script>
+<script>
+L.mapbox.accessToken = 'pk.eyJ1Ijoia3ViYTMyIiwiYSI6ImNpeGpoNzg5eTAwMHAycW5xa3VvYWt6dmYifQ.DqN_5HSTyzU7r6dcssQHkA';
+var map = L.mapbox.map('map', 'mapbox.streets')
+    .setView([40, -74.50], 9);
+</script>
 </body>
 </html>

@@ -40,6 +40,8 @@ const winston = require('winston');
   }
   process.on('SIGTERM', shutdown).on('SIGINT', shutdown);
 
+  console.log(process.env.CHROME_PATH)
+
   // Catch unhandled rejections
   process.on('unhandledRejection', winston.error);
 })();

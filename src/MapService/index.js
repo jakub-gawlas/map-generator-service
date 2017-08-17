@@ -29,17 +29,18 @@ class MapService {
         throw new Error('Cannot start web application');
       }
       this.chrome = await chromeLauncher.launch({
-        chromeFlags: ['--headless'],
+        chromeFlags: ['--headless', '--disable-gpu'],
       });
       this.headless = await chromeRemoteInterface({
         port: this.chrome.port,
       });
       const { Page, Runtime } = this.headless;
       await Promise.all([Page.enable(), Runtime.enable()]);
+      
       Page.navigate({ url: 'http://127.0.0.1:8080' });
       Page.loadEventFired(async () => {
         const setMapboxTokenScript = `
-          mapboxgl.accessToken = '${this.config.APP_MAP_SERVICE_MAPBOX_TOKEN}'
+          L.mapbox.accessToken = '${this.config.APP_MAP_SERVICE_MAPBOX_TOKEN}';
         `;
         await Runtime.evaluate({
           expression: setMapboxTokenScript,
@@ -79,36 +80,34 @@ class MapService {
    *  width {number}: width of result image, optional
    *  height {number}: height of result image, optional
    */
-  async getImageMap(
-    {
-      data,
-      width,
-      height,
-    } = {}
-  ) {
-    if(!data) throw new Error('Required parameter `data`');
+  async getImageMap({ data, width, height } = {}) {
+    if (!data) throw new Error('Required parameter `data`');
     const maxBounds = utils.getMaxBounds(data);
-    if(!maxBounds) throw new Error('Bad format of `data`. Required GeoJSON format.');
-    const enlargedMaxBounds = utils.enlargeBounds(maxBounds, ENLARGE_BOUNDS_FACTOR);
-    const source = data ? { type: 'geojson', data } : null;
+    if (!maxBounds)
+      throw new Error('Bad format of `data`. Required GeoJSON format.');
+    const enlargedMaxBounds = utils.enlargeBounds(
+      maxBounds,
+      ENLARGE_BOUNDS_FACTOR
+    );
 
     // Script to run getMap function from web-app/script.js
     const getMapScript = `getMap({
-      source: ${JSON.stringify(source)},
+      data: ${JSON.stringify(data)},
       maxBounds: ${JSON.stringify(enlargedMaxBounds)},
       width: ${width}, 
       height: ${height} 
     });`;
 
-    const { Runtime } = this.headless;
+    const { Runtime, Page } = this.headless;
     const image = await Runtime.evaluate({
       expression: getMapScript,
       awaitPromise: true,
     });
-    const imageDataURL = image.result.value;
-    if (!image.result.value) throw new Error('Cannot render map');
-    const imageBase64 = imageDataURL.replace(/^data:image\/\w+;base64,/, '');
-    const imageBuffer = new Buffer(imageBase64, 'base64');
+    const screenshot = await Page.captureScreenshot({
+      format: 'png',
+      fromSurface: true,
+    });
+    const imageBuffer = new Buffer(screenshot.data, 'base64');
     return imageBuffer;
   }
 }
